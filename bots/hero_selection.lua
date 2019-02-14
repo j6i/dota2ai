@@ -3,12 +3,12 @@ local BotPicks = {
 	'npc_dota_hero_tidehunter',
 	'npc_dota_hero_medusa',
 	'npc_dota_hero_phantom_assassin',
-	'npc_dota_hero_pugna',
+	'npc_dota_hero_chaos_knight',
 	'npc_dota_hero_bane',
 	'npc_dota_hero_crystal_maiden',
 	'npc_dota_hero_juggernaut',
 	'npc_dota_hero_abyssal_underlord',
-	'npc_dota_hero_chaos_knight',
+	'npc_dota_hero_pugna',
 	'npc_dota_hero_axe',
 	'npc_dota_hero_earthshaker',
 	'npc_dota_hero_skeleton_king',
@@ -32,6 +32,16 @@ local BotBans = {
 	'npc_dota_hero_slark'
 };
 
+function GetBotNames ()
+	local bot_names = {}
+	table.insert(bot_names, "@42SiliconValley");
+	table.insert(bot_names, "@DOTA2");
+	table.insert(bot_names, "@Lyd");
+	table.insert(bot_names, "@QwolfBLG");
+	table.insert(bot_names, "@mschroed098");
+	return bot_names
+end
+
 local picks = {};
 local maxPlayerID = 15;
 -- CHANGE THESE VALUES IF YOU'RE GETTING BUGS WITH BOTS NOT PICKING (or infinite loops)
@@ -54,35 +64,35 @@ end
 
 ------------------------------------------CAPTAIN'S MODE GAME MODE-------------------------------------------
 --Picking logic for Captain's Mode Game Mode
-local lastState = -1;
 function CaptainModeLogic()
 	if (GetGameState() ~= GAME_STATE_HERO_SELECTION) then
-        return
-    end
+		return
+	end
 	if GetHeroPickState() == HEROPICK_STATE_CM_CAPTAINPICK then
-		PickCaptain();
+		PickCaptain()
 	elseif GetHeroPickState() >= HEROPICK_STATE_CM_BAN1 and GetHeroPickState() <= 18 and GetCMPhaseTimeRemaining() <= NeededTime then
-		BansHero();
+		BansHero()
 	elseif GetHeroPickState() >= HEROPICK_STATE_CM_SELECT1 and GetHeroPickState() <= HEROPICK_STATE_CM_SELECT10 and GetCMPhaseTimeRemaining() <= NeededTime then
-		PicksHero();
+		PicksHero()
 	elseif GetHeroPickState() == HEROPICK_STATE_CM_PICK then
-		SelectsHero();
+		SelectsHero()
 	end
 end
 
 ----Pick the captain
 function PickCaptain()
-	local CaptBot = GetFirstBot();
-	if CaptBot ~= nil then
-		print("CAPTAIN PID : "..CaptBot)
-		SetCMCaptain(CaptBot)
+	if GetCMCaptain() == -1 then
+		local CaptBot = GetFirstBot()
+		if CaptBot ~= nil then
+			print("CAPTAIN PID : "..CaptBot)
+			SetCMCaptain(CaptBot)
+		end
 	end
-
 end
 
 ----Get the first bot to be the captain
 function GetFirstBot()
-	local BotId = nil;
+	local BotId = nil
 	local Players = GetTeamPlayers(GetTeam())
     for _,id in pairs(Players) do
         if IsPlayerBot(id) then
@@ -95,7 +105,7 @@ end
 
 ----Ban hero function
 function BansHero()
-	if not IsPlayerBot(GetCMCaptain()) then
+	if not IsPlayerBot(GetCMCaptain()) or not IsPlayerInHeroSelectionControl(GetCMCaptain()) then
 		return
 	end
 	local BannedHero = RandomBan();
@@ -106,7 +116,7 @@ end
 
 ----Pick hero function
 function PicksHero()
-	if not IsPlayerBot(GetCMCaptain()) then
+	if not IsPlayerBot(GetCMCaptain()) or not IsPlayerInHeroSelectionControl(GetCMCaptain()) then
 		return
 	end
 	local PickedHero = RandomHero();
