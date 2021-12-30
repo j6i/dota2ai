@@ -1,2 +1,2 @@
-# gota2ai
+# dota2ai
 dub
